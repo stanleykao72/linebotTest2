@@ -1,37 +1,43 @@
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
-from linebot import LineBotApi, WebhookParser
+from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError, LineBotApiError
-from linebot.models import MessageEvent, TextSendMessage
+from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
 # Create your views here.
+
+logger = logging.getLogger("django")
+
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 
 
 @csrf_exempt
-def callback(request):
-    if request.method == 'POST':
-        signature = request.META['HTTP_X_LINE_SIGNATURE']
-        body = request.body.decode('utf-8')
+@require_POST
+def callback(request: HttpRequest):
+    signature = request.headers["X-Line-Signature"]
+    body = request.body.decode()
 
-        try:
-            events = parser.parse(body, signature)
-        except InvalidSignatureError:
-            return HttpResponseForbidden()
-        except LineBotApiError:
-            return HttpResponseBadRequest()
+    try:
+        handler.handle(body, signature)
+    except InvalidSignatureError:
+        messages = (
+            "Invalid signature. Please check your channel access token/channel secret."
+        )
+        logger.error(messages)
+        return HttpResponseBadRequest(messages)
+    return HttpResponse("OK")
 
-        for event in events:
-            if isinstance(event, MessageEvent):
-                line_bot_api.reply_message(event.reply_token, TextSendMessage(text=event.message.text))
-
-        return HttpResponse()
-    else:
-        return HttpResponseBadRequest()
-
+@handler.add(event=MessageEvent, message=TextMessage)
+def handl_message(event: MessageEvent):
+    if event.source.user_id != "Ubfde1b3d40a9fe4b78fa4f3778cb374a":
+        line_bot_api.reply_message(
+            reply_token=event.reply_token,
+            messages=TextSendMessage(text=event.message.text),
+        )
 
 
 

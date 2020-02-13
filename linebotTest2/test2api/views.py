@@ -20,7 +20,7 @@ handler = WebhookHandler(settings.LINE_CHANNEL_SECRET)
 
 @csrf_exempt
 @require_POST
-def callback(request: HttpRequest):
+def webhook(request: HttpRequest):
     signature = request.headers["X-Line-Signature"]
     body = request.body.decode()
 

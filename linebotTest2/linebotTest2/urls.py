@@ -20,6 +20,6 @@ from test2api import views
 
 
 urlpatterns = [
-    url('^callback', views.callback),
     path('admin/', admin.site.urls),
+    path("line/", include("test2api.urls"),
 ]

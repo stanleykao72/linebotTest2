@@ -21,5 +21,5 @@ from test2api import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("line/", include("test2api.urls")
+    path('line/', include('test2api.urls')),
 ]

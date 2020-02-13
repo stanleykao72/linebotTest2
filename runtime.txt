@@ -1,1 +1,1 @@
-python-3.7.6s
+python-3.7.6

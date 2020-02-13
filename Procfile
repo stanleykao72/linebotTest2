@@ -1,1 +1,1 @@
-web: gunicorn --pythonpath linebotTest2.wsgi
+web: gunicorn linebotTest2.wsgi

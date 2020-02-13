@@ -1,5 +1,6 @@
 Django==2.2.5
 line-bot-sdk==1.15.0
+dj-static==0.06
 gunicorn
 django-heroku
 psycopg2-binary
